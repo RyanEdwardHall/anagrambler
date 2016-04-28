@@ -9,7 +9,7 @@ class Trie {
   }
   insert(words) {
     words.forEach(word => {
-      let englishWord = word;
+      var englishWord = word;
       word = word.split('').sort().join('');
       var characters = word.split('');
       var path = this.data;
@@ -32,15 +32,12 @@ class Trie {
     var noDupes = {};
     var self = this;
     letters = letters.split('').sort();
-    function searcher(prefix, remainder) {
-      var path = self.data;
+    function searcher(prefix, remainder, path) {
       if (noDupes[prefix] === undefined) {
         noDupes[prefix] = null;
       }
       try {
-        prefix.split('').forEach(character => {
-          path = path[character];
-        });
+        path = path[prefix.slice(-1)];
         if (path._words !== undefined) {
           noDupes[prefix] = path._words;
         }
@@ -53,13 +50,13 @@ class Trie {
         var popRemainder = remainderCopy.splice(index, 1);
         var newPrefix = (prefix + popRemainder).split('').sort().join('');
         if (noDupes[newPrefix] === undefined) {
-          return searcher(newPrefix, remainderCopy);
+          return searcher(newPrefix, remainderCopy, path);
         }
       });
     }
 
     while (letters.length > 1) {
-      searcher(letters.shift(), letters);
+      searcher(letters.shift(), letters, self.data);
     }
 
     Object.keys(noDupes).forEach(key => {
@@ -71,4 +68,4 @@ class Trie {
 }
 
 var TrieEnglishDic = new Trie(words);
-TrieEnglishDic.search('Honorificabilitudinitatibus');
+TrieEnglishDic.search('test');
