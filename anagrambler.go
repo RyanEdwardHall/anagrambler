@@ -49,7 +49,7 @@ func main() {
 
 	// initialize the data structure
 	root := &node{
-		words:    make([]string, 0, 50),
+		words:    make([]string, 0, 1),
 		children: make(map[string]*node),
 	}
 
@@ -66,7 +66,7 @@ func main() {
 			_, exists := path.children[letter]
 			if !exists {
 				path.children[letter] = &node{
-					words:    make([]string, 0, 50),
+					words:    make([]string, 0, 1),
 					children: make(map[string]*node),
 				}
 			}
