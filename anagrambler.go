@@ -22,7 +22,7 @@ func SortString(w string) string {
 
 type node struct {
 	words    []string
-	children map[string]*node
+	children map[rune]*node
 }
 
 func search(postfix string, path *node, results map[*node]bool) {
@@ -35,9 +35,9 @@ func search(postfix string, path *node, results map[*node]bool) {
 	}
 	searched_runes := make(map[rune]bool)
 	for i, letter := range postfix {
-		_, nodeExists := path.children[string(letter)]
+		_, nodeExists := path.children[letter]
 		if nodeExists && !searched_runes[letter] {
-			search(postfix[i+1:], path.children[string(letter)], results)
+			search(postfix[i+1:], path.children[letter], results)
 		}
 		if !searched_runes[letter] {
 			searched_runes[letter] = true
@@ -57,12 +57,12 @@ func LoadTrie(path *node, root *node) {
 		words[i] = SortString(words[i])
 		path = root
 		for x := 0; x < len(words[i]); x++ {
-			letter := string(words[i][x])
+			letter := rune(words[i][x])
 			_, exists := path.children[letter]
 			if !exists {
 				path.children[letter] = &node{
 					words:    make([]string, 0, 1),
-					children: make(map[string]*node),
+					children: make(map[rune]*node),
 				}
 			}
 			if len(words[i]) == (x + 1) {
@@ -77,7 +77,7 @@ func LoadTrie(path *node, root *node) {
 func main() {
 	root := &node{
 		words:    make([]string, 0, 1),
-		children: make(map[string]*node),
+		children: make(map[rune]*node),
 	}
 	path := root
 
@@ -87,10 +87,10 @@ func main() {
 	path = root
 	searchWord := SortString(os.Args[1])
 	results := make(map[*node]bool)
-	for i := range searchWord {
-		_, nodeExists := path.children[searchWord[i:i+1]]
+	for i, letter := range searchWord {
+		_, nodeExists := path.children[letter]
 		if nodeExists {
-			search(searchWord[i+1:], path.children[searchWord[i:i+1]], results)
+			search(searchWord[i+1:], path.children[letter], results)
 		}
 	}
 
