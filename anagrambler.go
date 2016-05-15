@@ -25,12 +25,10 @@ type node struct {
 	children map[string]*node
 }
 
-func search(prefix string, postfix string, path *node, results map[string]string) {
+func search(prefix string, postfix string, path *node, results map[*node]bool) {
 	if len(path.words) > 0 {
-		fullPath := SortString(path.words[0])
-		_, exists := results[fullPath]
-		if !exists {
-			results[fullPath] = strings.Join(path.words, ",")
+		if !results[path] {
+			results[path] = true
 		}
 	}
 	for i, letter := range postfix {
@@ -81,7 +79,7 @@ func main() {
 	//search trie (adnor has lots of anagrams)
 	path = root
 	searchWord := SortString(os.Args[1])
-	results := make(map[string]string, 100)
+	results := make(map[*node]bool)
 	for i := range searchWord {
 		_, nodeExists := path.children[searchWord[i:i+1]]
 		if nodeExists {
@@ -89,7 +87,7 @@ func main() {
 		}
 	}
 
-	for i := range results {
-		fmt.Println(results[i])
+	for path := range results {
+		fmt.Println(path.words)
 	}
 }
