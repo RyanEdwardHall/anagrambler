@@ -29,12 +29,18 @@ func search(prefix string, postfix string, path *node, results map[*node]bool) {
 	if len(path.words) > 0 {
 		if !results[path] {
 			results[path] = true
+		} else {
+			return
 		}
 	}
+	searched_runes := make(map[rune]bool)
 	for i, letter := range postfix {
 		_, nodeExists := path.children[string(letter)]
-		if nodeExists {
+		if nodeExists && !searched_runes[letter] {
 			search(string(letter), postfix[i+1:], path.children[string(letter)], results)
+		}
+		if !searched_runes[letter] {
+			searched_runes[letter] = true
 		}
 	}
 }
