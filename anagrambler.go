@@ -25,7 +25,7 @@ type node struct {
 	children map[string]*node
 }
 
-func search(prefix string, postfix string, path *node, results map[*node]bool) {
+func search(postfix string, path *node, results map[*node]bool) {
 	if len(path.words) > 0 {
 		if !results[path] {
 			results[path] = true
@@ -37,7 +37,7 @@ func search(prefix string, postfix string, path *node, results map[*node]bool) {
 	for i, letter := range postfix {
 		_, nodeExists := path.children[string(letter)]
 		if nodeExists && !searched_runes[letter] {
-			search(string(letter), postfix[i+1:], path.children[string(letter)], results)
+			search(postfix[i+1:], path.children[string(letter)], results)
 		}
 		if !searched_runes[letter] {
 			searched_runes[letter] = true
@@ -90,7 +90,7 @@ func main() {
 	for i := range searchWord {
 		_, nodeExists := path.children[searchWord[i:i+1]]
 		if nodeExists {
-			search(searchWord[i:i+1], searchWord[i+1:], path.children[searchWord[i:i+1]], results)
+			search(searchWord[i+1:], path.children[searchWord[i:i+1]], results)
 		}
 	}
 
