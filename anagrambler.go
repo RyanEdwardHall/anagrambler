@@ -94,9 +94,7 @@ func main() {
 		}
 	}
 
-	counter := 0
 	for path := range results {
-		counter += len(path.words)
+    fmt.Println(path.words)
 	}
-	fmt.Println(counter)
 }
