@@ -39,19 +39,10 @@ func search(prefix string, postfix string, path *node, results map[*node]bool) {
 	}
 }
 
-func main() {
-	// load dictionary
+func LoadTrie(path *node, root *node) {
 	data, err := ioutil.ReadFile("go-dict.txt")
-	// data, err := ioutil.ReadFile("testwords.txt")
 	check(err)
 
-	// initialize the data structure
-	root := &node{
-		words:    make([]string, 0, 1),
-		children: make(map[string]*node),
-	}
-
-	path := root
 	words := strings.Split(string(data), "\n")
 	words = words[:len(words)-1]
 	for i := 0; i < len(words); i++ {
@@ -75,6 +66,16 @@ func main() {
 			}
 		}
 	}
+}
+
+func main() {
+	root := &node{
+		words:    make([]string, 0, 1),
+		children: make(map[string]*node),
+	}
+	path := root
+
+	LoadTrie(path, root)
 
 	//search trie (adnor has lots of anagrams)
 	path = root
@@ -87,7 +88,9 @@ func main() {
 		}
 	}
 
+	counter := 0
 	for path := range results {
-		fmt.Println(path.words)
+		counter += len(path.words)
 	}
+	fmt.Println(counter)
 }
