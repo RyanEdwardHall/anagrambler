@@ -1,26 +1,23 @@
-package main
+package anagrambler_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/RyanEdwardHall/anagrambler"
+)
 
 func TestKnownOutput(t *testing.T) {
-	root := &node{
-		words:    make([]string, 0, 1),
-		children: make(map[rune]*node),
-	}
-	path := root
-	LoadTrie(path, root)
-	searchWord := SortString("honorificabilitudinitatibus")
-	results := make(map[*node]bool)
-	for i, letter := range searchWord {
-		_, nodeExists := path.children[letter]
-		if nodeExists {
-			search(searchWord[i+1:], path.children[letter], results)
-		}
-	}
-	
+	trie := anagrambler.NewNode()
+
+	anagrambler.LoadDict(trie, "go-dict.txt")
+
+	searchWord := "honorificabilitudinitatibus"
+
+	results := anagrambler.Search(trie, searchWord)
+
 	counter := 0
 	for path := range results {
-		counter += len(path.words)
+		counter += len(path.Words)
 	}
 	if counter != 9083 {
 		t.Error("Expected 9083 words, got ", counter)
@@ -28,22 +25,15 @@ func TestKnownOutput(t *testing.T) {
 }
 
 func BenchmarkAnagrambler(b *testing.B) {
-	root := &node{
-		words:    make([]string, 0, 1),
-		children: make(map[rune]*node),
-	}
-	path := root
-	LoadTrie(path, root)
-	searchWord := SortString("Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon")
-	results := make(map[*node]bool)
+	trie := anagrambler.NewNode()
+
+	anagrambler.LoadDict(trie, "go-dict.txt")
+
+	searchWord := "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon"
 
 	b.ResetTimer()
+
 	for counter := 0; counter < b.N; counter++ {
-		for i, letter := range searchWord {
-			_, nodeExists := path.children[letter]
-			if nodeExists {
-				search(searchWord[i+1:], path.children[letter], results)
-			}
-		}
+		anagrambler.Search(trie, searchWord)
 	}
 }
