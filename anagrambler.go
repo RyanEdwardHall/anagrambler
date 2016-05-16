@@ -52,31 +52,69 @@ func AddWord(root *Node, word string) {
 	path.Words = append(path.Words, word)
 }
 
-func Search(root *Node, word string) map[*Node]bool {
+func Search(root *Node, text string, filter string) []string {
 	results := make(map[*Node]bool)
 
-	search(sortedLower(word), root, results)
+	search(root, sortedLower(text), sortedLower(filter), results)
 
-	return results
+	filteredResults := make([]string, 0)
+
+	for node := range results {
+		for _, word := range node.Words {
+			if strings.Contains(word, filter) {
+				filteredResults = append(filteredResults, word)
+			}
+		}
+	}
+
+	return filteredResults
 }
 
-func search(postfix string, path *Node, results map[*Node]bool) {
-	if len(path.Words) > 0 {
-		if !results[path] {
-			results[path] = true
+func search(n *Node, text string, filter string, results map[*Node]bool) {
+	// Record any words stored at this node
+	// Only record acronyms after the filter has been satisfied
+	if filter == "" && len(n.Words) > 0 {
+		if !results[n] {
+			// Add this node's acronyms to the results
+			results[n] = true
 		} else {
+			// We've already traversed this node, so stop searching it
 			return
 		}
 	}
 
+	// Keep track of which runes we've searched
 	searched_runes := make(map[rune]bool)
 
-	for i, letter := range postfix {
-		_, nodeExists := path.Children[letter]
-		if nodeExists && !searched_runes[letter] {
-			search(postfix[i+1:], path.Children[letter], results)
-
-			searched_runes[letter] = true
+	for i, letter := range text {
+		// Skip any runes that we don't have nodes for
+		// or that we've already searched for (i.e. duplicate runes)
+		if n.Children[letter] == nil || searched_runes[letter] == true {
+			continue
 		}
+
+		var new_filter string
+
+		switch {
+		case filter == "":
+			// The filter has already been satisfied
+			new_filter = ""
+		case letter < rune(filter[0]):
+			// This letter doesn't affect the filter
+			new_filter = filter[:]
+		case letter == rune(filter[0]):
+			// This letter satisfies the next rune in the filter, so we can
+			// remove it from the filter
+			new_filter = filter[1:]
+		case letter > rune(filter[0]):
+			// The remaining letters in the text are all greater than the next
+			// required filter rune, so none of the remaining substrings will
+			// satisfy the filter
+			return
+		}
+
+		search(n.Children[letter], text[i+1:], new_filter, results)
+
+		searched_runes[letter] = true
 	}
 }
