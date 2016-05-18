@@ -13,14 +13,10 @@ func TestKnownOutput(t *testing.T) {
 
 	searchWord := "honorificabilitudinitatibus"
 
-	results := anagrambler.Search(trie, searchWord)
+	results := anagrambler.Search(trie, searchWord, "")
 
-	counter := 0
-	for path := range results {
-		counter += len(path.Words)
-	}
-	if counter != 9083 {
-		t.Error("Expected 9083 words, got ", counter)
+	if len(results) != 9083 {
+		t.Error("Expected 9083 words, got ", len(results))
 	}
 }
 
@@ -34,6 +30,6 @@ func BenchmarkAnagrambler(b *testing.B) {
 	b.ResetTimer()
 
 	for counter := 0; counter < b.N; counter++ {
-		anagrambler.Search(trie, searchWord)
+		anagrambler.Search(trie, searchWord, "")
 	}
 }
