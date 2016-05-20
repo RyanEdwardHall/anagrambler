@@ -3,6 +3,9 @@ package anagrambler_test
 import (
 	"testing"
 
+	"io/ioutil"
+	"strings"
+
 	"github.com/RyanEdwardHall/anagrambler"
 )
 
@@ -33,6 +36,26 @@ func testAnagramCount(t *testing.T, d dataItem) {
 	}
 }
 
+
+func benchmarkFillTrie(b *testing.B, dictPath string) {
+	data, err := ioutil.ReadFile(dictPath)
+
+	if err != nil {
+		b.Error("Could not load dictionary", dictPath, err)
+	}
+
+	words := strings.Split(string(data), "\n")
+	words = words[:len(words)-1]
+
+	for counter := 0; counter < b.N; counter++ {
+		trie := anagrambler.NewNode()
+
+		for _, word := range words {
+			anagrambler.AddWord(trie, word)
+		}
+	}
+}
+
 func benchmarkSearch(b *testing.B, d dataItem) {
 	trie := anagrambler.NewNode()
 
@@ -49,6 +72,8 @@ func benchmarkSearch(b *testing.B, d dataItem) {
 
 func TestAnagramCountShort(t *testing.T) { testAnagramCount(t, testData[0]) }
 func TestAngaramCountLong(t *testing.T) { testAnagramCount(t, testData[1]) }
+
+func BenchmarkFillTrie(b *testing.B) { benchmarkFillTrie(b, testData[0].dict) }
 
 func BenchmarkSearchShort(b *testing.B) { benchmarkSearch(b, testData[0]) }
 func BenchmarkSearchLong(b *testing.B) { benchmarkSearch(b, testData[1]) }
