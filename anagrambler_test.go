@@ -16,21 +16,27 @@ type dataItem struct {
 	anagrams int
 }
 
-var testData = []dataItem {
-	{"go-dict.txt", "honorificabilitudinitatibus", "", 9083},
-	{"go-dict.txt", "honorificabilitudinitatibus", "bus", 34},
-	{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 26035},
-	{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "ultra", 24},
-	{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
-	{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
+// Test data and test fixtures
+var (
+	testData = []dataItem {
+		{"go-dict.txt", "honorificabilitudinitatibus", "", 9083},
+		{"go-dict.txt", "honorificabilitudinitatibus", "bus", 34},
+		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 26035},
+		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "ultra", 24},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
+	}
+	testTrie = anagrambler.NewNode()
+)
+
+
+func init() {
+	anagrambler.LoadDict(testTrie, testData[0].dict)
 }
 
+
 func testAnagramCount(t *testing.T, d dataItem) {
-	trie := anagrambler.NewNode()
-
-	anagrambler.LoadDict(trie, d.dict)
-
-	results := anagrambler.Search(trie, d.input, d.filter)
+	results := anagrambler.Search(testTrie, d.input, d.filter)
 
 	if len(results) == d.anagrams {
 		t.Logf("Success: found all %d expected anagrams for '%s' with filter '%s'\n", d.anagrams, d.input, d.filter)
@@ -60,14 +66,8 @@ func benchmarkFillTrie(b *testing.B, dictPath string) {
 }
 
 func benchmarkSearch(b *testing.B, d dataItem) {
-	trie := anagrambler.NewNode()
-
-	anagrambler.LoadDict(trie, d.dict)
-
-	b.ResetTimer()
-
 	for counter := 0; counter < b.N; counter++ {
-		anagrambler.Search(trie, d.input, d.filter)
+		anagrambler.Search(testTrie, d.input, d.filter)
 	}
 }
 
