@@ -12,12 +12,17 @@ import (
 type dataItem struct {
 	dict string
 	input string
+	filter string
 	anagrams int
 }
 
 var testData = []dataItem {
-	{"go-dict.txt", "honorificabilitudinitatibus", 9083},
-	{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", 112436},
+	{"go-dict.txt", "honorificabilitudinitatibus", "", 9083},
+	{"go-dict.txt", "honorificabilitudinitatibus", "bus", 34},
+	{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 26035},
+	{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "ultra", 24},
+	{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
+	{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
 }
 
 func testAnagramCount(t *testing.T, d dataItem) {
@@ -25,12 +30,10 @@ func testAnagramCount(t *testing.T, d dataItem) {
 
 	anagrambler.LoadDict(trie, d.dict)
 
-	searchWord := d.input
-
-	results := anagrambler.Search(trie, searchWord, "")
+	results := anagrambler.Search(trie, d.input, d.filter)
 
 	if len(results) == d.anagrams {
-		t.Logf("Success: found all %d expected anagrams for '%s'\n", d.anagrams, d.input)
+		t.Logf("Success: found all %d expected anagrams for '%s' with filter '%s'\n", d.anagrams, d.input, d.filter)
 	} else {
 		t.Error("Expected", d.anagrams, "words, got ", len(results))
 	}
@@ -61,19 +64,25 @@ func benchmarkSearch(b *testing.B, d dataItem) {
 
 	anagrambler.LoadDict(trie, d.dict)
 
-	searchWord := d.input
-
 	b.ResetTimer()
 
 	for counter := 0; counter < b.N; counter++ {
-		anagrambler.Search(trie, searchWord, "")
+		anagrambler.Search(trie, d.input, d.filter)
 	}
 }
 
 func TestAnagramCountShort(t *testing.T) { testAnagramCount(t, testData[0]) }
-func TestAngaramCountLong(t *testing.T) { testAnagramCount(t, testData[1]) }
+func TestAnagramCountShortFiltered(t *testing.T) { testAnagramCount(t, testData[1]) }
+func TestAnagramCountMedium(t *testing.T) { testAnagramCount(t, testData[2]) }
+func TestAnagramCountMediumFiltered(t *testing.T) { testAnagramCount(t, testData[3]) }
+func TestAngaramCountLong(t *testing.T) { testAnagramCount(t, testData[4]) }
+func TestAngaramCountLongFilter(t *testing.T) { testAnagramCount(t, testData[5]) }
 
 func BenchmarkFillTrie(b *testing.B) { benchmarkFillTrie(b, testData[0].dict) }
 
 func BenchmarkSearchShort(b *testing.B) { benchmarkSearch(b, testData[0]) }
-func BenchmarkSearchLong(b *testing.B) { benchmarkSearch(b, testData[1]) }
+func BenchmarkSearchShortFiltered(b *testing.B) { benchmarkSearch(b, testData[1]) }
+func BenchmarkSearchMedium(b *testing.B) { benchmarkSearch(b, testData[2]) }
+func BenchmarkSearchMediumFiltered(b *testing.B) { benchmarkSearch(b, testData[3]) }
+func BenchmarkSearchLong(b *testing.B) { benchmarkSearch(b, testData[4]) }
+func BenchmarkSearchLongFiltered(b *testing.B) { benchmarkSearch(b, testData[5]) }
