@@ -35,7 +35,9 @@ func newNode() *node {
 	}
 }
 
-func LoadDict(t *Trie, filepath string) {
+func LoadDict(filepath string) *Trie {
+	t := NewTrie()
+
 	data, err := ioutil.ReadFile(filepath)
 
 	if err != nil {
@@ -46,11 +48,13 @@ func LoadDict(t *Trie, filepath string) {
 	words = words[:len(words)-1]
 
 	for _, word := range words {
-		AddWord(t, word)
+		t.AddWord(word)
 	}
+
+	return t
 }
 
-func AddWord(t *Trie, word string) {
+func (t *Trie) AddWord(word string) {
 	path := t.root
 
 	for _, letter := range sortedLower(word) {
@@ -62,7 +66,7 @@ func AddWord(t *Trie, word string) {
 	path.Words = append(path.Words, word)
 }
 
-func Search(t *Trie, text string, filter string) []string {
+func (t *Trie) Search(text string, filter string) []string {
 	results := make(map[*node]bool)
 
 	search(t.root, sortedLower(text), sortedLower(filter), results)
