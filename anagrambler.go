@@ -35,13 +35,13 @@ func newNode() *node {
 	}
 }
 
-func Open(filepath string) *Trie {
+func Open(filepath string) (*Trie, error) {
 	t := NewTrie()
 
 	data, err := ioutil.ReadFile(filepath)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	words := strings.Split(string(data), "\n")
@@ -51,7 +51,7 @@ func Open(filepath string) *Trie {
 		t.Add(word)
 	}
 
-	return t
+	return t, nil
 }
 
 func (t *Trie) Add(word string) {

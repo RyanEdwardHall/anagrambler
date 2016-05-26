@@ -26,8 +26,17 @@ var (
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
 	}
-	testTrie = anagrambler.Open(testData[0].dict)
+	testTrie *anagrambler.Trie
 )
+
+func init() {
+	var err error
+	testTrie, err = anagrambler.Open(testData[0].dict)
+
+	if err != nil {
+		panic(err)
+	}
+}
 
 func testAnagramCount(t *testing.T, d dataItem) {
 	results := testTrie.Search(d.input, d.filter)
