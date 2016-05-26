@@ -26,7 +26,7 @@ var (
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
 	}
-	testTrie = anagrambler.NewNode()
+	testTrie = anagrambler.NewTrie()
 )
 
 func init() {
@@ -54,7 +54,7 @@ func benchmarkFillTrie(b *testing.B, dictPath string) {
 	words = words[:len(words)-1]
 
 	for counter := 0; counter < b.N; counter++ {
-		trie := anagrambler.NewNode()
+		trie := anagrambler.NewTrie()
 
 		for _, word := range words {
 			anagrambler.AddWord(trie, word)

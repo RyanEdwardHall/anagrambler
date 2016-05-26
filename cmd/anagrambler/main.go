@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	trie := anagrambler.NewNode()
+	trie := anagrambler.NewTrie()
 
 	anagrambler.LoadDict(trie, "go-dict.txt")
 
