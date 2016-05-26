@@ -6,12 +6,7 @@ import (
 	"strings"
 )
 
-func sortedLower(w string) string {
-	w = strings.ToLower(w)
-	s := strings.Split(w, "")
-	sort.Strings(s)
-	return strings.Join(s, "")
-}
+// Types
 
 type Trie struct {
 	root *node
@@ -22,16 +17,11 @@ type node struct {
 	Children map[rune]*node
 }
 
+// Exported functions
+
 func NewTrie() *Trie {
 	return &Trie{
 		root: newNode(),
-	}
-}
-
-func newNode() *node {
-	return &node{
-		Words:    make([]string, 0, 1),
-		Children: make(map[rune]*node),
 	}
 }
 
@@ -53,6 +43,8 @@ func Open(filepath string) (*Trie, error) {
 
 	return t, nil
 }
+
+// Exported Methods
 
 func (t *Trie) Add(word string) {
 	path := t.root
@@ -82,6 +74,22 @@ func (t *Trie) Search(text string, filter string) []string {
 	}
 
 	return filteredResults
+}
+
+// Unexported Functions
+
+func newNode() *node {
+	return &node{
+		Words:    make([]string, 0, 1),
+		Children: make(map[rune]*node),
+	}
+}
+
+func sortedLower(w string) string {
+	w = strings.ToLower(w)
+	s := strings.Split(w, "")
+	sort.Strings(s)
+	return strings.Join(s, "")
 }
 
 func search(n *node, text string, filter string, results map[*node]bool) {
