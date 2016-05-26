@@ -14,24 +14,24 @@ func sortedLower(w string) string {
 }
 
 type Trie struct {
-	root *Node
+	root *node
 }
 
-type Node struct {
+type node struct {
 	Words    []string
-	Children map[rune]*Node
+	Children map[rune]*node
 }
 
 func NewTrie() *Trie {
 	return &Trie{
-		root: NewNode(),
+		root: newNode(),
 	}
 }
 
-func NewNode() *Node {
-	return &Node{
+func newNode() *node {
+	return &node{
 		Words:    make([]string, 0, 1),
-		Children: make(map[rune]*Node),
+		Children: make(map[rune]*node),
 	}
 }
 
@@ -55,7 +55,7 @@ func AddWord(t *Trie, word string) {
 
 	for _, letter := range sortedLower(word) {
 		if path.Children[letter] == nil {
-			path.Children[letter] = NewNode()
+			path.Children[letter] = newNode()
 		}
 		path = path.Children[letter]
 	}
@@ -63,7 +63,7 @@ func AddWord(t *Trie, word string) {
 }
 
 func Search(t *Trie, text string, filter string) []string {
-	results := make(map[*Node]bool)
+	results := make(map[*node]bool)
 
 	search(t.root, sortedLower(text), sortedLower(filter), results)
 
@@ -80,7 +80,7 @@ func Search(t *Trie, text string, filter string) []string {
 	return filteredResults
 }
 
-func search(n *Node, text string, filter string, results map[*Node]bool) {
+func search(n *node, text string, filter string, results map[*node]bool) {
 	// Record any words stored at this node
 	// Only record acronyms after the filter has been satisfied
 	if filter == "" && len(n.Words) > 0 {
