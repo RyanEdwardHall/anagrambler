@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	t := anagrambler.LoadDict("go-dict.txt")
+	t := anagrambler.Open("go-dict.txt")
 
 	if len(os.Args) > 1 {
 		searchWord := os.Args[1]

@@ -26,7 +26,7 @@ var (
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
 	}
-	testTrie = anagrambler.LoadDict(testData[0].dict)
+	testTrie = anagrambler.Open(testData[0].dict)
 )
 
 func testAnagramCount(t *testing.T, d dataItem) {
@@ -53,7 +53,7 @@ func benchmarkFillTrie(b *testing.B, dictPath string) {
 		trie := anagrambler.NewTrie()
 
 		for _, word := range words {
-			trie.AddWord(word)
+			trie.Add(word)
 		}
 	}
 }
