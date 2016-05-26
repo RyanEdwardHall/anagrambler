@@ -26,15 +26,20 @@ var (
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
 		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
 	}
-	testTrie = anagrambler.NewNode()
+	testTrie *anagrambler.Trie
 )
 
 func init() {
-	anagrambler.LoadDict(testTrie, testData[0].dict)
+	var err error
+	testTrie, err = anagrambler.Open(testData[0].dict)
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func testAnagramCount(t *testing.T, d dataItem) {
-	results := anagrambler.Search(testTrie, d.input, d.filter)
+	results := testTrie.Search(d.input, d.filter)
 
 	if len(results) == d.anagrams {
 		t.Logf("Success: found all %d expected anagrams for '%s' with filter '%s'\n", d.anagrams, d.input, d.filter)
@@ -54,17 +59,17 @@ func benchmarkFillTrie(b *testing.B, dictPath string) {
 	words = words[:len(words)-1]
 
 	for counter := 0; counter < b.N; counter++ {
-		trie := anagrambler.NewNode()
+		trie := anagrambler.NewTrie()
 
 		for _, word := range words {
-			anagrambler.AddWord(trie, word)
+			trie.Add(word)
 		}
 	}
 }
 
 func benchmarkSearch(b *testing.B, d dataItem) {
 	for counter := 0; counter < b.N; counter++ {
-		anagrambler.Search(testTrie, d.input, d.filter)
+		testTrie.Search(d.input, d.filter)
 	}
 }
 

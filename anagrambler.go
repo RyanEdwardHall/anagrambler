@@ -6,56 +6,62 @@ import (
 	"strings"
 )
 
-func sortedLower(w string) string {
-	w = strings.ToLower(w)
-	s := strings.Split(w, "")
-	sort.Strings(s)
-	return strings.Join(s, "")
+// Types
+
+type Trie struct {
+	root *node
 }
 
-type Node struct {
+type node struct {
 	Words    []string
-	Children map[rune]*Node
+	Children map[rune]*node
 }
 
-func NewNode() *Node {
-	return &Node{
-		Words:    make([]string, 0, 1),
-		Children: make(map[rune]*Node),
+// Exported functions
+
+func NewTrie() *Trie {
+	return &Trie{
+		root: newNode(),
 	}
 }
 
-func LoadDict(root *Node, filepath string) {
+func Open(filepath string) (*Trie, error) {
+	t := NewTrie()
+
 	data, err := ioutil.ReadFile(filepath)
 
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	words := strings.Split(string(data), "\n")
 	words = words[:len(words)-1]
 
 	for _, word := range words {
-		AddWord(root, word)
+		t.Add(word)
 	}
+
+	return t, nil
 }
 
-func AddWord(root *Node, word string) {
-	path := root
+// Exported Methods
+
+func (t *Trie) Add(word string) {
+	path := t.root
 
 	for _, letter := range sortedLower(word) {
 		if path.Children[letter] == nil {
-			path.Children[letter] = NewNode()
+			path.Children[letter] = newNode()
 		}
 		path = path.Children[letter]
 	}
 	path.Words = append(path.Words, word)
 }
 
-func Search(root *Node, text string, filter string) []string {
-	results := make(map[*Node]bool)
+func (t *Trie) Search(text string, filter string) []string {
+	results := make(map[*node]bool)
 
-	search(root, sortedLower(text), sortedLower(filter), results)
+	search(t.root, sortedLower(text), sortedLower(filter), results)
 
 	filteredResults := make([]string, 0)
 
@@ -70,7 +76,23 @@ func Search(root *Node, text string, filter string) []string {
 	return filteredResults
 }
 
-func search(n *Node, text string, filter string, results map[*Node]bool) {
+// Unexported Functions
+
+func newNode() *node {
+	return &node{
+		Words:    make([]string, 0, 1),
+		Children: make(map[rune]*node),
+	}
+}
+
+func sortedLower(w string) string {
+	w = strings.ToLower(w)
+	s := strings.Split(w, "")
+	sort.Strings(s)
+	return strings.Join(s, "")
+}
+
+func search(n *node, text string, filter string, results map[*node]bool) {
 	// Record any words stored at this node
 	// Only record acronyms after the filter has been satisfied
 	if filter == "" && len(n.Words) > 0 {
