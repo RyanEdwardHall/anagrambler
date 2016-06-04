@@ -42,7 +42,8 @@ func Open(filepath string) (*Trie, error) {
 	words = words[:len(words)-1]
 
 	for _, word := range words {
-		t.add(word)
+		sortedWord := sortWord(bytes.ToLower(word))
+		t.add(word, sortedWord)
 	}
 
 	return t, nil
@@ -51,7 +52,10 @@ func Open(filepath string) (*Trie, error) {
 // Exported Methods
 
 func (t *Trie) Add(word string) {
-	t.add([]byte(word))
+
+	sortedWord := sortWord(bytes.ToLower([]byte(word)))
+
+	t.add([]byte(word), sortedWord)
 }
 
 
@@ -75,10 +79,8 @@ func (t *Trie) Search(text string, filter string) []string {
 	return filteredResults
 }
 
-func (t *Trie) add(word []byte) {
+func (t *Trie) add(word, sortedWord []byte) {
 	path := t.root
-
-	sortedWord := sortWord(bytes.ToLower(word))
 
 	for i, w := 0, 0; i < len(sortedWord); i += w {
 		r, width := utf8.DecodeRune(sortedWord[i:])
