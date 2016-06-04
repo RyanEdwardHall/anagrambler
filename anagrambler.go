@@ -1,9 +1,10 @@
 package anagrambler
 
 import (
+	"bytes"
 	"io/ioutil"
 	"sort"
-	"strings"
+	"unicode/utf8"
 )
 
 // Types
@@ -13,9 +14,12 @@ type Trie struct {
 }
 
 type node struct {
-	Words    []string
+	Words    [][]byte
 	Children map[rune]*node
 }
+
+// sortBytes is necessary because sort.Sort requires a named type
+type sortBytes []byte
 
 // Exported functions
 
@@ -34,11 +38,11 @@ func Open(filepath string) (*Trie, error) {
 		return nil, err
 	}
 
-	words := strings.Split(string(data), "\n")
+	words := bytes.Split(data, []byte("\n"))
 	words = words[:len(words)-1]
 
 	for _, word := range words {
-		t.Add(word)
+		t.add(word)
 	}
 
 	return t, nil
@@ -47,28 +51,23 @@ func Open(filepath string) (*Trie, error) {
 // Exported Methods
 
 func (t *Trie) Add(word string) {
-	path := t.root
-
-	for _, letter := range sortedLower(word) {
-		if path.Children[letter] == nil {
-			path.Children[letter] = newNode()
-		}
-		path = path.Children[letter]
-	}
-	path.Words = append(path.Words, word)
+	t.add([]byte(word))
 }
+
 
 func (t *Trie) Search(text string, filter string) []string {
 	results := make(map[*node]bool)
 
-	search(t.root, sortedLower(text), sortedLower(filter), results)
+	sortedText, sortedFilter := sortWord(bytes.ToLower([]byte(text))), sortWord(bytes.ToLower([]byte(filter)))
+
+	search(t.root, sortedText, sortedFilter, results)
 
 	filteredResults := make([]string, 0)
 
 	for node := range results {
 		for _, word := range node.Words {
-			if strings.Contains(word, filter) {
-				filteredResults = append(filteredResults, word)
+			if bytes.Contains(word, []byte(filter)) {
+				filteredResults = append(filteredResults, string(word))
 			}
 		}
 	}
@@ -76,26 +75,55 @@ func (t *Trie) Search(text string, filter string) []string {
 	return filteredResults
 }
 
+func (t *Trie) add(word []byte) {
+	path := t.root
+
+	sortedWord := sortWord(bytes.ToLower(word))
+
+	for i, w := 0, 0; i < len(sortedWord); i += w {
+		r, width := utf8.DecodeRune(sortedWord[i:])
+
+		if path.Children[r] == nil {
+			path.Children[r] = newNode()
+		}
+		path = path.Children[r]
+
+		w = width
+	}
+
+	path.Words = append(path.Words, word)
+}
+
 // Unexported Functions
 
 func newNode() *node {
 	return &node{
-		Words:    make([]string, 0, 1),
+		Words:    make([][]byte, 0, 1),
 		Children: make(map[rune]*node),
 	}
 }
 
-func sortedLower(w string) string {
-	w = strings.ToLower(w)
-	s := strings.Split(w, "")
-	sort.Strings(s)
-	return strings.Join(s, "")
+func (s sortBytes) Less(i, j int) bool {
+    return s[i] < s[j]
 }
 
-func search(n *node, text string, filter string, results map[*node]bool) {
+func (s sortBytes) Swap(i, j int) {
+    s[i], s[j] = s[j], s[i]
+}
+
+func (s sortBytes) Len() int {
+    return len(s)
+}
+
+func sortWord(w []byte) []byte {
+	sort.Sort(sortBytes(w))
+	return w
+}
+
+func search(n *node, text []byte, filter []byte, results map[*node]bool) {
 	// Record any words stored at this node
 	// Only record acronyms after the filter has been satisfied
-	if filter == "" && len(n.Words) > 0 {
+	if len(filter) == 0 && len(n.Words) != 0 {
 		if !results[n] {
 			// Add this node's acronyms to the results
 			results[n] = true
@@ -108,35 +136,33 @@ func search(n *node, text string, filter string, results map[*node]bool) {
 	// Keep track of which runes we've searched
 	searched_runes := make(map[rune]bool)
 
-	for i, letter := range text {
+	for i, w := 0, 0; i < len(text); i += w {
+		r, width := utf8.DecodeRune(text[i:])
+		w = width
+
 		// Skip any runes that we don't have nodes for
 		// or that we've already searched for (i.e. duplicate runes)
-		if n.Children[letter] == nil || searched_runes[letter] == true {
+		if n.Children[r] == nil || searched_runes[r] == true {
 			continue
 		}
 
-		var new_filter string
+		if len(filter) != 0 {
+			fRune, fWidth := utf8.DecodeRune(filter)
 
-		switch {
-		case filter == "":
-			// The filter has already been satisfied
-			new_filter = ""
-		case letter < rune(filter[0]):
-			// This letter doesn't affect the filter
-			new_filter = filter[:]
-		case letter == rune(filter[0]):
-			// This letter satisfies the next rune in the filter, so we can
-			// remove it from the filter
-			new_filter = filter[1:]
-		case letter > rune(filter[0]):
-			// The remaining letters in the text are all greater than the next
-			// required filter rune, so none of the remaining substrings will
-			// satisfy the filter
-			return
+			if r == fRune {
+				// This letter satisfies the next rune in the filter, so we can
+				// remove it from the filter
+				filter = filter[fWidth:]
+			} else if r > fRune {
+				// The remaining letters in the text are all greater than the next
+				// required filter rune, so none of the remaining substrings will
+				// satisfy the filter
+				return
+			}
 		}
 
-		search(n.Children[letter], text[i+1:], new_filter, results)
+		search(n.Children[r], text[i+width:], filter, results)
 
-		searched_runes[letter] = true
+		searched_runes[r] = true
 	}
 }
