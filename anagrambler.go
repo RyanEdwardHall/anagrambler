@@ -42,7 +42,9 @@ func Open(filepath string) (*Trie, error) {
 	words = words[:len(words)-1]
 
 	for _, word := range words {
-		sortedWord := sortWord(bytes.ToLower(word))
+		sortedWord := make([]byte, len(word))
+		copy(sortedWord, word)
+		sortWord(sortedWord)
 		t.add(word, sortedWord)
 	}
 
@@ -53,7 +55,9 @@ func Open(filepath string) (*Trie, error) {
 
 func (t *Trie) Add(word string) {
 
-	sortedWord := sortWord(bytes.ToLower([]byte(word)))
+	sortedWord := make([]byte, len(word))
+	copy(sortedWord, word)
+	sortWord(sortedWord)
 
 	t.add([]byte(word), sortedWord)
 }
@@ -62,7 +66,14 @@ func (t *Trie) Add(word string) {
 func (t *Trie) Search(text string, filter string) []string {
 	results := make(map[*node]bool)
 
-	sortedText, sortedFilter := sortWord(bytes.ToLower([]byte(text))), sortWord(bytes.ToLower([]byte(filter)))
+	sortedText := make([]byte, len(text))
+	sortedFilter := make([]byte, len(filter))
+
+	copy(sortedText, text)
+	copy(sortedFilter, filter)
+
+	sortWord(sortedText)
+	sortWord(sortedFilter)
 
 	search(t.root, sortedText, sortedFilter, results)
 
