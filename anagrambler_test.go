@@ -19,12 +19,12 @@ type dataItem struct {
 // Test data and test fixtures
 var (
 	testData = []dataItem{
-		{"go-dict.txt", "honorificabilitudinitatibus", "", 9083},
-		{"go-dict.txt", "honorificabilitudinitatibus", "bus", 34},
-		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 26035},
+		{"go-dict.txt", "honorificabilitudinitatibus", "", 7214},
+		{"go-dict.txt", "honorificabilitudinitatibus", "bus", 29},
+		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 22090},
 		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "ultra", 24},
-		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
-		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 98616},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 318},
 	}
 	testTrie *anagrambler.Trie
 )
