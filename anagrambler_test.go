@@ -48,6 +48,15 @@ func testAnagramCount(t *testing.T, d dataItem) {
 	}
 }
 
+func benchmarkOpen(b *testing.B, dictPath string) {
+	for counter := 0; counter < b.N; counter++ {
+		_, err := anagrambler.Open(dictPath)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func benchmarkFillTrie(b *testing.B, dictPath string) {
 	data, err := ioutil.ReadFile(dictPath)
 
@@ -83,6 +92,8 @@ func TestAngaramCountLongFilter(t *testing.T)     { testAnagramCount(t, testData
 
 // Benchmarks for loading a dictionary file into a trie.
 func BenchmarkFillTrie(b *testing.B) { benchmarkFillTrie(b, testData[0].dict) }
+
+func BenchmarkOpen(b *testing.B) { benchmarkOpen(b, testData[0].dict) }
 
 // Benchmarks for searching for anagrams.
 func BenchmarkSearchShort(b *testing.B)          { benchmarkSearch(b, testData[0]) }
