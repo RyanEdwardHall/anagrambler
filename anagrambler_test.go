@@ -19,12 +19,12 @@ type dataItem struct {
 // Test data and test fixtures
 var (
 	testData = []dataItem{
-		{"go-dict.txt", "honorificabilitudinitatibus", "", 9083},
-		{"go-dict.txt", "honorificabilitudinitatibus", "bus", 34},
-		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 26035},
+		{"go-dict.txt", "honorificabilitudinitatibus", "", 7214},
+		{"go-dict.txt", "honorificabilitudinitatibus", "bus", 29},
+		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "", 22090},
 		{"go-dict.txt", "pneumonoultramicroscopicsilicovolcanoconiosis", "ultra", 24},
-		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 112436},
-		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 342},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "", 98616},
+		{"go-dict.txt", "Lopadotemachoselachogaleokranioleipsanodrimhypotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon", "pet", 318},
 	}
 	testTrie *anagrambler.Trie
 )
@@ -45,6 +45,15 @@ func testAnagramCount(t *testing.T, d dataItem) {
 		t.Logf("Success: found all %d expected anagrams for '%s' with filter '%s'\n", d.anagrams, d.input, d.filter)
 	} else {
 		t.Error("Expected", d.anagrams, "words, got ", len(results))
+	}
+}
+
+func benchmarkOpen(b *testing.B, dictPath string) {
+	for counter := 0; counter < b.N; counter++ {
+		_, err := anagrambler.Open(dictPath)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -83,6 +92,8 @@ func TestAngaramCountLongFilter(t *testing.T)     { testAnagramCount(t, testData
 
 // Benchmarks for loading a dictionary file into a trie.
 func BenchmarkFillTrie(b *testing.B) { benchmarkFillTrie(b, testData[0].dict) }
+
+func BenchmarkOpen(b *testing.B) { benchmarkOpen(b, testData[0].dict) }
 
 // Benchmarks for searching for anagrams.
 func BenchmarkSearchShort(b *testing.B)          { benchmarkSearch(b, testData[0]) }
