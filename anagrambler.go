@@ -148,14 +148,24 @@ func search(n *node, text []byte, filter []byte, results map[*node]bool) {
 
 	// Keep track of which runes we've searched
 	searched_runes := make(map[rune]bool)
+	var searchable_nodes []rune
 
 	for i, w := 0, 0; i < len(text); i += w {
 		r, width := utf8.DecodeRune(text[i:])
 		w = width
 
+		// search all nodes if current rune is '*'
+		if r == '*' {
+			for key, _ := range n.Children {
+				searchable_nodes = append(searchable_nodes, key)
+			}
+		} else {
+			searchable_nodes = append(searchable_nodes, r)
+		}
+
 		// Skip any runes that we don't have nodes for
 		// or that we've already searched for (i.e. duplicate runes)
-		if n.Children[r] == nil || searched_runes[r] == true {
+		if len(searchable_nodes) == 0 || searched_runes[r] == true {
 			continue
 		}
 
@@ -173,9 +183,11 @@ func search(n *node, text []byte, filter []byte, results map[*node]bool) {
 				return
 			}
 		}
-
-		search(n.Children[r], text[i+width:], filter, results)
-
-		searched_runes[r] = true
+		for _, node := range searchable_nodes {
+			if n.Children[node] != nil {
+				search(n.Children[node], text[i+width:], filter, results)
+				searched_runes[node] = true
+			}
+		}
 	}
 }
