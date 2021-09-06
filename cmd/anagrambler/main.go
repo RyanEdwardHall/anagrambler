@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RyanEdwardHall/anagrambler"
+	"github.com/RyanEdwardHall/anagrambler/internal/anagrambler"
 )
 
 func main() {

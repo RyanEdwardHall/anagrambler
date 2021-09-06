@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"github.com/RyanEdwardHall/anagrambler"
+	"github.com/RyanEdwardHall/anagrambler/internal/anagrambler"
 )
 
 type dataItem struct {
