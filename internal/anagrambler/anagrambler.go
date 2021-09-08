@@ -154,7 +154,7 @@ func search(n *node, text []byte, filter []byte, results map[*node]bool) {
 
 		// Skip any runes that we don't have nodes for
 		// or that we've already searched for (i.e. duplicate runes)
-		if n.Children[r] == nil || searched_runes[r] == true {
+		if n.Children[r] == nil || searched_runes[r] {
 			continue
 		}
 
