@@ -2,7 +2,7 @@ package anagrambler
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 	"sort"
 	"unicode/utf8"
 )
@@ -32,7 +32,7 @@ func NewTrie() *Trie {
 func Open(filepath string) (*Trie, error) {
 	t := NewTrie()
 
-	data, err := ioutil.ReadFile(filepath)
+	data, err := os.ReadFile(filepath)
 
 	if err != nil {
 		return nil, err
@@ -61,7 +61,6 @@ func (t *Trie) Add(word string) {
 
 	t.add([]byte(word), sortedWord)
 }
-
 
 func (t *Trie) Search(text string, filter string) []string {
 	results := make(map[*node]bool)
@@ -117,15 +116,15 @@ func newNode() *node {
 }
 
 func (s sortBytes) Less(i, j int) bool {
-    return s[i] < s[j]
+	return s[i] < s[j]
 }
 
 func (s sortBytes) Swap(i, j int) {
-    s[i], s[j] = s[j], s[i]
+	s[i], s[j] = s[j], s[i]
 }
 
 func (s sortBytes) Len() int {
-    return len(s)
+	return len(s)
 }
 
 func sortWord(w []byte) []byte {
