@@ -1,33 +1,30 @@
-BIN = bin
-CMD := ${BIN}/anagrambler
+BINDIR := bin
+BIN := ${BINDIR}/anagrambler
 
-.PHONY: all
-all: fmt test
+.PHONY: all build clean
+.PHONY: fmt lint test bench
 
-${BIN}:
-	mkdir -p ${BIN}
+all: build fmt lint test
 
-${BIN}/%: ${BIN}
-	go build -v -o $@ cmd/$(@F)/main.go
+${BINDIR}:
+	mkdir -p ${BINDIR}
 
-.PHONY: build
-build: ${CMD}
+${BIN}: build
 
-.PHONY: rebuild
-rebuild: clean build
+build: ${BINDIR}
+	go build -v -o ${BIN} cmd/anagrambler/main.go
 
-.PHONY: clean
-clean: ${BIN}
-	rm -f ${CMD}
+clean: ${BINDIR}
+	rm -f ${BIN}
 
-.PHONY: fmt
 fmt:
 	go fmt ./...
 
-.PHONY: lint
 lint:
 	golangci-lint run
 
-.PHONY: test
 test:
 	go test ./...
+
+bench:
+	go test -run=none -bench=. ./...
