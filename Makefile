@@ -1,20 +1,12 @@
 BINDIR := bin
 BIN := ${BINDIR}/anagrambler
 
-.PHONY: all build clean
-.PHONY: fmt lint test bench
+.PHONY: build clean fmt lint test bench
 
-all: build fmt lint test
-
-${BINDIR}:
-	mkdir -p ${BINDIR}
-
-${BIN}: build
-
-build: ${BINDIR}
+build: | ${BINDIR}
 	go build -v -o ${BIN} cmd/anagrambler/main.go
 
-clean: ${BINDIR}
+clean: | ${BINDIR}
 	rm -f ${BIN}
 
 fmt:
@@ -28,3 +20,6 @@ test:
 
 bench:
 	go test -run=none -bench=. ./...
+
+${BINDIR}:
+	mkdir -p ${BINDIR}
